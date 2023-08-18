@@ -1,0 +1,29 @@
+#!/usr/bin/env groovy
+pipeline {
+    agent any
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION = "us-east-1"
+        postgrespass = credentials('postgrespass')
+    }
+    stages {
+        /*stage("Deploy Metrics") {
+            steps {
+                script {
+                    sh "aws eks --region us-east-1 update-kubeconfig --name assess-eks-cluster"
+                    sh "helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/"
+                    sh "helm upgrade --install metrics-server metrics-server/metrics-server"
+                }
+            }
+        }*/
+        stage("Deploy Postgres") {
+            steps {
+                script {
+                    
+                    sh "helm install postgres --set global.postgresql.auth.postgresPassword=$postgrespass --set global.postgresql.auth.password=$postgrespass postgresql"
+                }
+            }
+        }
+    }
+}
